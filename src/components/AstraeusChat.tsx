@@ -3,7 +3,7 @@
 import type React from "react"
 
 import { useState, useRef, useEffect, useMemo } from "react"
-import { Send, Sparkles, Brain, Settings, Plus, MessageSquare, Zap, Star } from "lucide-react"
+import { Send, Sparkles, Brain, Settings, Plus, MessageSquare } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { renderMarkdown } from "@/lib/markdown"
 
@@ -26,26 +26,12 @@ export default function AstraeusChat() {
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({
-      behavior: "smooth",
-      block: "end",
-      inline: "nearest",
-    })
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
   }
 
   useEffect(() => {
     scrollToBottom()
   }, [messages])
-
-  // Add this after the existing useEffect
-  useEffect(() => {
-    // Ensure we scroll to bottom when new messages are added
-    const timer = setTimeout(() => {
-      scrollToBottom()
-    }, 100) // Small delay to ensure DOM is updated
-
-    return () => clearTimeout(timer)
-  }, [messages.length])
 
   // Streaming markdown rendering - re-render entire content on each chunk
   const renderedMessages = useMemo(() => {
@@ -154,269 +140,210 @@ export default function AstraeusChat() {
   }
 
   return (
-    <div className="flex h-screen bg-cosmic-void font-inter relative overflow-hidden">
-      {/* Cosmic Background - Fixed position */}
-      <div className="cosmic-background">
-        {/* Starfield */}
-        <div className="absolute inset-0 starfield"></div>
-
-        {/* Nebula Effects */}
-        <div className="absolute top-0 right-1/4 w-96 h-96 bg-gradient-to-r from-purple-500/20 via-rbc-blue/30 to-cyan-400/20 rounded-full blur-3xl animate-cosmic-drift"></div>
-        <div className="absolute bottom-1/4 left-1/5 w-80 h-80 bg-gradient-to-r from-rbc-yellow/20 via-orange-400/15 to-pink-400/20 rounded-full blur-3xl animate-cosmic-drift-reverse"></div>
-        <div className="absolute top-1/2 left-1/2 w-64 h-64 bg-gradient-to-r from-indigo-500/15 via-purple-500/20 to-rbc-blue/25 rounded-full blur-3xl animate-cosmic-pulse"></div>
-
-        {/* Orbital Rings */}
-        <div className="absolute top-1/4 left-1/4 w-32 h-32 border border-rbc-yellow/20 rounded-full animate-orbital-slow"></div>
-        <div className="absolute bottom-1/3 right-1/3 w-24 h-24 border border-cyan-400/20 rounded-full animate-orbital-fast"></div>
-
-        {/* Floating Particles */}
-        <div className="cosmic-particles"></div>
+    <div className="flex h-screen bg-gradient-to-br from-rbc-blue via-blue-700 to-blue-800 font-inter">
+      {/* Animated background elements */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-1/4 right-1/4 w-96 h-96 bg-gradient-to-r from-rbc-yellow/10 to-yellow-400/5 rounded-full blur-3xl animate-float"></div>
+        <div className="absolute bottom-1/3 left-1/5 w-80 h-80 bg-gradient-to-r from-blue-400/10 to-cyan-400/5 rounded-full blur-3xl animate-float-delayed"></div>
+        <div className="absolute top-1/2 left-1/2 w-64 h-64 bg-gradient-to-r from-rbc-yellow/8 to-orange-400/4 rounded-full blur-3xl animate-float-slow"></div>
       </div>
 
-      {/* Sidebar - Fixed height with internal scrolling */}
-      <div className="w-64 bg-cosmic-glass backdrop-blur-xl border-r border-cosmic-border flex flex-col relative z-10 h-full overflow-hidden">
+      {/* Sidebar */}
+      <div className="w-64 bg-white/10 backdrop-blur-xl border-r border-white/20 flex flex-col relative z-10">
         {/* Header */}
-        <div className="p-6 border-b border-cosmic-border flex-shrink-0">
+        <div className="p-6 border-b border-white/20">
           <div className="flex items-center gap-3 mb-6">
-            <div className="relative">
-              <div className="w-10 h-10 bg-gradient-to-br from-rbc-yellow to-orange-400 rounded-xl flex items-center justify-center shadow-lg cosmic-glow">
-                <Brain className="w-6 h-6 text-rbc-blue" />
-              </div>
-              <div className="absolute -top-1 -right-1 w-3 h-3 bg-cyan-400 rounded-full animate-pulse-cosmic"></div>
+            <div className="w-10 h-10 bg-rbc-yellow rounded-xl flex items-center justify-center shadow-lg">
+              <Brain className="w-6 h-6 text-rbc-blue" />
             </div>
             <div>
-              <h1 className="text-xl font-bold text-white cosmic-text-glow">Astraeus</h1>
-              <p className="text-sm text-cosmic-text-secondary flex items-center gap-1">
-                <Star className="w-3 h-3 text-rbc-yellow" />
-                Cosmic Analytics AI
-              </p>
+              <h1 className="text-xl font-bold text-white">Astraeus</h1>
+              <p className="text-sm text-white/70">RBC Analytics AI</p>
             </div>
           </div>
 
-          <button className="w-full flex items-center gap-3 px-4 py-3 bg-cosmic-button hover:bg-cosmic-button-hover rounded-xl transition-all duration-300 text-white group cosmic-button-effect">
-            <Plus className="w-4 h-4 group-hover:rotate-90 transition-transform duration-300" />
-            <span className="font-medium">New Constellation</span>
+          <button className="w-full flex items-center gap-3 px-4 py-3 bg-white/20 hover:bg-white/30 rounded-xl transition-colors text-white">
+            <Plus className="w-4 h-4" />
+            <span className="font-medium">New Chat</span>
           </button>
         </div>
 
-        {/* Chat History - Scrollable */}
-        <div className="flex-1 p-4 space-y-2 overflow-y-auto cosmic-scrollbar">
-          <div className="text-xs font-semibold text-cosmic-text-muted uppercase tracking-wider mb-3 flex items-center gap-2">
-            <Sparkles className="w-3 h-3" />
-            Recent Explorations
-          </div>
+        {/* Chat History */}
+        <div className="flex-1 p-4 space-y-2">
+          <div className="text-xs font-semibold text-white/50 uppercase tracking-wider mb-3">Recent Chats</div>
           {[
-            "Revenue Nebula Analysis Q4",
-            "Customer Galaxy Mapping",
-            "Risk Asteroid Assessment",
-            "Market Constellation Trends",
-            "Profit Star Formation Study",
-            "Investment Black Hole Analysis",
-            "Economic Supernova Predictions",
-            "Financial Orbit Calculations",
-            "Data Mining Expedition",
-            "Cosmic Cash Flow Analysis",
+            "Revenue Analysis Q4 2024",
+            "Customer Segmentation Insights",
+            "Risk Assessment Report",
+            "Market Trends Analysis",
           ].map((chat, i) => (
             <button
               key={i}
-              className="w-full text-left px-3 py-2 text-sm text-cosmic-text-secondary hover:text-white hover:bg-cosmic-hover rounded-lg transition-all duration-300 truncate group cosmic-hover-effect"
+              className="w-full text-left px-3 py-2 text-sm text-white/80 hover:text-white hover:bg-white/10 rounded-lg transition-colors truncate"
             >
-              <MessageSquare className="w-3 h-3 inline mr-2 group-hover:text-rbc-yellow transition-colors" />
+              <MessageSquare className="w-3 h-3 inline mr-2" />
               {chat}
             </button>
           ))}
         </div>
 
         {/* Model Selector */}
-        <div className="p-4 border-t border-cosmic-border flex-shrink-0">
-          <div className="text-xs font-semibold text-cosmic-text-muted uppercase tracking-wider mb-3 flex items-center gap-2">
-            <Zap className="w-3 h-3" />
-            Data Universe
-          </div>
+        <div className="p-4 border-t border-white/20">
+          <div className="text-xs font-semibold text-white/50 uppercase tracking-wider mb-3">Dataset</div>
           <div className="space-y-2">
             {["PAR", "DFR"].map((model) => (
               <button
                 key={model}
                 onClick={() => setSelectedModel(model as ModelType)}
                 className={cn(
-                  "w-full text-left px-3 py-2 text-sm rounded-lg transition-all duration-300 cosmic-button-effect",
+                  "w-full text-left px-3 py-2 text-sm rounded-lg transition-colors",
                   selectedModel === model
-                    ? "bg-gradient-to-r from-rbc-yellow to-orange-400 text-rbc-blue font-semibold cosmic-glow"
-                    : "text-cosmic-text-secondary hover:text-white hover:bg-cosmic-hover",
+                    ? "bg-rbc-yellow text-rbc-blue font-semibold"
+                    : "text-white/80 hover:text-white hover:bg-white/10",
                 )}
               >
-                {model} Constellation
+                {model} Analytics
               </button>
             ))}
           </div>
         </div>
 
         {/* Settings */}
-        <div className="p-4 border-t border-cosmic-border flex-shrink-0">
-          <button className="w-full flex items-center gap-3 px-3 py-2 text-sm text-cosmic-text-secondary hover:text-white hover:bg-cosmic-hover rounded-lg transition-all duration-300 cosmic-hover-effect">
+        <div className="p-4 border-t border-white/20">
+          <button className="w-full flex items-center gap-3 px-3 py-2 text-sm text-white/80 hover:text-white hover:bg-white/10 rounded-lg transition-colors">
             <Settings className="w-4 h-4" />
-            Cosmic Settings
+            Settings
           </button>
         </div>
       </div>
 
-      {/* Main Chat Area - Proper flex layout */}
-      <div className="flex-1 flex flex-col relative z-10 h-full overflow-hidden">
-        {/* Top Bar - Fixed */}
-        <div className="bg-cosmic-glass backdrop-blur-xl border-b border-cosmic-border px-6 py-4 flex-shrink-0">
+      {/* Main Chat Area */}
+      <div className="flex-1 flex flex-col relative z-10">
+        {/* Top Bar */}
+        <div className="bg-white/10 backdrop-blur-xl border-b border-white/20 px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="relative">
-                <div className="w-8 h-8 bg-gradient-to-br from-rbc-yellow to-orange-400 rounded-lg flex items-center justify-center cosmic-glow">
-                  <Brain className="w-4 h-4 text-rbc-blue" />
-                </div>
-                <div className="absolute -top-1 -right-1 w-2 h-2 bg-cyan-400 rounded-full animate-pulse-cosmic"></div>
+              <div className="w-8 h-8 bg-rbc-yellow rounded-lg flex items-center justify-center">
+                <Brain className="w-4 h-4 text-rbc-blue" />
               </div>
               <div>
-                <h2 className="font-semibold text-white cosmic-text-glow">Cosmic Analytics Assistant</h2>
-                <p className="text-sm text-cosmic-text-secondary flex items-center gap-1">
-                  <div className="w-1 h-1 bg-cyan-400 rounded-full animate-pulse-cosmic"></div>
-                  Connected to {selectedModel} constellation
-                </p>
+                <h2 className="font-semibold text-white">Analytics Assistant</h2>
+                <p className="text-sm text-white/70">Connected to {selectedModel} dataset</p>
               </div>
             </div>
-            <div className="flex items-center gap-3">
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse-cosmic cosmic-glow-green"></div>
-                <span className="text-sm text-cosmic-text-secondary">Orbital Status: Active</span>
-              </div>
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+              <span className="text-sm text-white/70">Online</span>
             </div>
           </div>
         </div>
 
         {/* Messages */}
-        <div className="flex-1 overflow-hidden flex flex-col">
-          <div className="flex-1 overflow-y-auto scroll-smooth cosmic-scrollbar">
-            {messages.length === 0 ? (
-              <div className="h-full flex items-center justify-center p-8">
-                <div className="text-center max-w-2xl">
-                  <div className="relative mb-8">
-                    <div className="w-20 h-20 bg-gradient-to-br from-rbc-yellow via-orange-400 to-rbc-yellow rounded-2xl flex items-center justify-center mx-auto shadow-2xl cosmic-glow">
-                      <Sparkles className="w-10 h-10 text-rbc-blue" />
-                    </div>
-                    <div className="absolute -top-2 -right-2 w-6 h-6 bg-cyan-400 rounded-full animate-orbital-fast cosmic-glow-cyan"></div>
-                    <div className="absolute -bottom-2 -left-2 w-4 h-4 bg-purple-400 rounded-full animate-pulse-cosmic"></div>
-                  </div>
-
-                  <h3 className="text-4xl font-bold text-white mb-4 cosmic-text-glow">
-                    Your idea of{" "}
-                    <span className="text-rbc-yellow italic font-script cosmic-text-glow-yellow">
-                      exploring the cosmos
-                    </span>{" "}
-                    of data happens here
-                  </h3>
-
-                  <p className="text-lg text-cosmic-text-secondary mb-8 leading-relaxed">
-                    Navigate through galaxies of {selectedModel} data using natural language. Discover stellar insights,
-                    generate cosmic reports, and uncover hidden patterns in the financial universe.
-                  </p>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-lg mx-auto">
-                    {[
-                      { text: "Show me revenue constellations for Q4", icon: "🌟" },
-                      { text: "Map customer galaxies by region", icon: "🌌" },
-                      { text: "Scan for risk asteroids", icon: "☄️" },
-                      { text: "Generate a cosmic performance summary", icon: "✨" },
-                    ].map((suggestion, i) => (
-                      <button
-                        key={i}
-                        onClick={() => setInput(suggestion.text)}
-                        className="p-4 bg-cosmic-card hover:bg-cosmic-card-hover rounded-xl text-sm text-white transition-all duration-300 text-left border border-cosmic-border hover:border-rbc-yellow/50 cosmic-hover-effect group"
-                      >
-                        <div className="flex items-center gap-2 mb-2">
-                          <span className="text-lg">{suggestion.icon}</span>
-                          <div className="w-1 h-1 bg-rbc-yellow rounded-full group-hover:animate-pulse-cosmic"></div>
-                        </div>
-                        {suggestion.text}
-                      </button>
-                    ))}
-                  </div>
+        <div className="flex-1 overflow-y-auto">
+          {messages.length === 0 ? (
+            <div className="h-full flex items-center justify-center p-8">
+              <div className="text-center max-w-2xl">
+                <div className="w-16 h-16 bg-rbc-yellow rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
+                  <Sparkles className="w-8 h-8 text-rbc-blue" />
+                </div>
+                <h3 className="text-3xl font-bold text-white mb-4">
+                  Your idea of <span className="text-rbc-yellow italic font-script">building insights</span> happens
+                  here
+                </h3>
+                <p className="text-lg text-white/80 mb-8 leading-relaxed">
+                  Ask questions about your {selectedModel} data using natural language. Get instant insights, generate
+                  reports, and discover patterns in your financial data.
+                </p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-lg mx-auto">
+                  {[
+                    "Show me revenue trends for Q4",
+                    "Analyze customer segments by region",
+                    "What are the top risk factors?",
+                    "Generate a performance summary",
+                  ].map((suggestion, i) => (
+                    <button
+                      key={i}
+                      onClick={() => setInput(suggestion)}
+                      className="p-3 bg-white/10 hover:bg-white/20 rounded-xl text-sm text-white/90 hover:text-white transition-colors text-left border border-white/20 hover:border-white/30"
+                    >
+                      {suggestion}
+                    </button>
+                  ))}
                 </div>
               </div>
-            ) : (
-              <div className="p-6 space-y-6 min-h-full">
-                {renderedMessages.map((message, index) => (
+            </div>
+          ) : (
+            <div className="p-6 space-y-6">
+              {renderedMessages.map((message, index) => (
+                <div
+                  key={message.id}
+                  className={cn(
+                    "flex gap-4 animate-fade-in",
+                    message.role === "user" ? "justify-end" : "justify-start",
+                  )}
+                  style={{ animationDelay: `${index * 0.1}s` }}
+                >
+                  {message.role === "assistant" && (
+                    <div className="w-8 h-8 bg-rbc-yellow rounded-lg flex items-center justify-center flex-shrink-0 mt-1">
+                      <Brain className="w-4 h-4 text-rbc-blue" />
+                    </div>
+                  )}
                   <div
-                    key={message.id}
                     className={cn(
-                      "flex gap-4 animate-fade-in",
-                      message.role === "user" ? "justify-end" : "justify-start",
+                      "max-w-3xl rounded-2xl px-6 py-4 shadow-lg",
+                      message.role === "user"
+                        ? "bg-rbc-blue text-white ml-12"
+                        : "bg-white text-gray-900 border border-gray-200",
                     )}
-                    style={{ animationDelay: `${index * 0.1}s` }}
                   >
-                    {message.role === "assistant" && (
-                      <div className="relative flex-shrink-0">
-                        <div className="w-8 h-8 bg-gradient-to-br from-rbc-yellow to-orange-400 rounded-lg flex items-center justify-center mt-1 cosmic-glow">
-                          <Brain className="w-4 h-4 text-rbc-blue" />
+                    {message.role === "assistant" ? (
+                      <div
+                        className="prose prose-gray max-w-none"
+                        dangerouslySetInnerHTML={{ __html: message.renderedContent }}
+                      />
+                    ) : (
+                      <div className="leading-relaxed">{message.content}</div>
+                    )}
+
+                    {message.isStreaming && (
+                      <div className="flex items-center gap-2 mt-3 pt-3 border-t border-gray-200">
+                        <div className="flex space-x-1">
+                          {[0, 1, 2].map((i) => (
+                            <div
+                              key={i}
+                              className="w-1.5 h-1.5 bg-rbc-blue rounded-full animate-bounce"
+                              style={{ animationDelay: `${i * 0.1}s` }}
+                            />
+                          ))}
                         </div>
-                        <div className="absolute -top-1 -right-1 w-3 h-3 bg-cyan-400 rounded-full animate-pulse-cosmic"></div>
+                        <span className="text-xs text-gray-500">Analyzing data...</span>
                       </div>
                     )}
+
                     <div
                       className={cn(
-                        "max-w-3xl rounded-2xl px-6 py-4 shadow-2xl cosmic-message-glow break-words",
-                        message.role === "user"
-                          ? "bg-gradient-to-br from-rbc-blue to-blue-700 text-white ml-12 border border-rbc-blue/50"
-                          : "bg-cosmic-card text-gray-100 border border-cosmic-border",
+                        "flex items-center gap-2 mt-3 text-xs",
+                        message.role === "user" ? "text-white/70" : "text-gray-500",
                       )}
                     >
-                      {message.role === "assistant" ? (
-                        <div
-                          className="prose prose-cosmic max-w-none overflow-hidden"
-                          dangerouslySetInnerHTML={{ __html: message.renderedContent }}
-                        />
-                      ) : (
-                        <div className="leading-relaxed whitespace-pre-wrap">{message.content}</div>
-                      )}
-
-                      {message.isStreaming && (
-                        <div className="flex items-center gap-3 mt-4 pt-3 border-t border-cosmic-border">
-                          <div className="flex space-x-1">
-                            {[0, 1, 2].map((i) => (
-                              <div
-                                key={i}
-                                className="w-2 h-2 bg-rbc-yellow rounded-full animate-cosmic-bounce cosmic-glow-yellow"
-                                style={{ animationDelay: `${i * 0.2}s` }}
-                              />
-                            ))}
-                          </div>
-                          <span className="text-xs text-cosmic-text-secondary">Scanning cosmic data streams...</span>
-                        </div>
-                      )}
-
-                      <div
-                        className={cn(
-                          "flex items-center gap-2 mt-3 text-xs",
-                          message.role === "user" ? "text-white/70" : "text-cosmic-text-muted",
-                        )}
-                      >
-                        <Star className="w-2 h-2" />
-                        <span>{message.timestamp.toLocaleTimeString()}</span>
-                      </div>
+                      <div className="w-1 h-1 bg-current rounded-full"></div>
+                      <span>{message.timestamp.toLocaleTimeString()}</span>
                     </div>
-                    {message.role === "user" && (
-                      <div className="relative flex-shrink-0">
-                        <div className="w-8 h-8 bg-cosmic-user-avatar rounded-lg flex items-center justify-center mt-1 border border-cosmic-border">
-                          <div className="w-4 h-4 bg-white rounded-full"></div>
-                        </div>
-                        <div className="absolute -top-1 -right-1 w-2 h-2 bg-rbc-yellow rounded-full animate-pulse-cosmic"></div>
-                      </div>
-                    )}
                   </div>
-                ))}
-                <div ref={messagesEndRef} className="h-4" />
-              </div>
-            )}
-          </div>
+                  {message.role === "user" && (
+                    <div className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center flex-shrink-0 mt-1">
+                      <div className="w-5 h-5 bg-white rounded-full"></div>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+          <div ref={messagesEndRef} />
         </div>
 
         {/* Input Area */}
-        <div className="bg-cosmic-glass backdrop-blur-xl border-t border-cosmic-border p-6">
+        <div className="bg-white/10 backdrop-blur-xl border-t border-white/20 p-6">
           <form onSubmit={handleSubmit} className="max-w-4xl mx-auto">
             <div className="flex gap-4 items-end">
               <div className="flex-1 relative">
@@ -425,8 +352,8 @@ export default function AstraeusChat() {
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   onKeyDown={handleKeyDown}
-                  placeholder={`Ask the cosmos about ${selectedModel} data...`}
-                  className="w-full px-6 py-4 bg-cosmic-input rounded-2xl resize-none focus:outline-none focus:ring-2 focus:ring-rbc-yellow/50 text-white placeholder-cosmic-text-muted transition-all duration-300 shadow-lg border border-cosmic-border cosmic-input-glow"
+                  placeholder={`Ask a question about ${selectedModel} data...`}
+                  className="w-full px-6 py-4 bg-white rounded-2xl resize-none focus:outline-none focus:ring-2 focus:ring-rbc-yellow text-gray-900 placeholder-gray-500 transition-all duration-300 shadow-lg border border-gray-200"
                   rows={1}
                   style={{
                     minHeight: "56px",
@@ -436,17 +363,17 @@ export default function AstraeusChat() {
                 />
                 {isLoading && (
                   <div className="absolute right-4 top-1/2 transform -translate-y-1/2">
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-2">
                       <div className="flex space-x-1">
                         {[0, 1, 2].map((i) => (
                           <div
                             key={i}
-                            className="w-2 h-2 bg-rbc-yellow rounded-full animate-cosmic-bounce cosmic-glow-yellow"
-                            style={{ animationDelay: `${i * 0.2}s` }}
+                            className="w-1.5 h-1.5 bg-rbc-blue rounded-full animate-bounce"
+                            style={{ animationDelay: `${i * 0.1}s` }}
                           />
                         ))}
                       </div>
-                      <span className="text-xs text-cosmic-text-secondary">Processing cosmic signals...</span>
+                      <span className="text-xs text-gray-500">Processing...</span>
                     </div>
                   </div>
                 )}
@@ -455,22 +382,15 @@ export default function AstraeusChat() {
               <button
                 type="submit"
                 disabled={!input.trim() || isLoading}
-                className="relative p-4 bg-gradient-to-br from-rbc-yellow to-orange-400 hover:from-yellow-300 hover:to-orange-300 text-rbc-blue rounded-2xl shadow-lg transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:hover:scale-100 disabled:cursor-not-allowed cosmic-glow group"
+                className="p-4 bg-rbc-yellow hover:bg-yellow-400 text-rbc-blue rounded-2xl shadow-lg transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:hover:scale-100 disabled:cursor-not-allowed"
               >
-                <Send className="w-5 h-5 group-hover:translate-x-0.5 transition-transform" />
-                <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                <Send className="w-5 h-5" />
               </button>
             </div>
 
-            <div className="flex items-center justify-between mt-3 text-xs text-cosmic-text-muted">
-              <span className="flex items-center gap-2">
-                <Star className="w-3 h-3" />
-                Press Enter to launch • Shift+Enter for new orbit
-              </span>
-              <span className="flex items-center gap-2">
-                Powered by Cosmic RBC Analytics
-                <Sparkles className="w-3 h-3 text-rbc-yellow" />
-              </span>
+            <div className="flex items-center justify-between mt-3 text-xs text-white/60">
+              <span>Press Enter to send • Shift+Enter for new line</span>
+              <span>Powered by RBC Analytics AI</span>
             </div>
           </form>
         </div>
