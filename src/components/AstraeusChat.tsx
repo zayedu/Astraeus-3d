@@ -1,10 +1,11 @@
 "use client"
 
 import type React from "react"
-import { useState, useRef, useEffect } from "react"
-import { Send, BarChart3, Database, Sparkles, Zap, Activity, Brain } from "lucide-react"
-import { Button } from "./ui/button"
-import { Card } from "./ui/card"
+
+import { useState, useRef, useEffect, useMemo } from "react"
+import { Send, Sparkles, Activity, Brain, TrendingUp } from "lucide-react"
+import { cn } from "@/lib/utils"
+import { renderMarkdown } from "@/lib/markdown"
 
 type ModelType = "PAR" | "DFR"
 
@@ -32,6 +33,14 @@ export default function AstraeusChat() {
     scrollToBottom()
   }, [messages])
 
+  // Memoized markdown rendering for performance
+  const renderedMessages = useMemo(() => {
+    return messages.map((message) => ({
+      ...message,
+      renderedContent: message.role === "assistant" ? renderMarkdown(message.content) : message.content,
+    }))
+  }, [messages])
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!input.trim() || isLoading) return
@@ -47,7 +56,6 @@ export default function AstraeusChat() {
     setInput("")
     setIsLoading(true)
 
-    // Create assistant message for streaming
     const assistantMessageId = (Date.now() + 1).toString()
     const assistantMessage: Message = {
       id: assistantMessageId,
@@ -103,7 +111,6 @@ export default function AstraeusChat() {
           }
         }
 
-        // Mark streaming as complete
         setMessages((prev) => prev.map((msg) => (msg.id === assistantMessageId ? { ...msg, isStreaming: false } : msg)))
       }
     } catch (error) {
@@ -112,7 +119,7 @@ export default function AstraeusChat() {
           msg.id === assistantMessageId
             ? {
                 ...msg,
-                content: "Sorry, I encountered an error while processing your request. Please try again.",
+                content: "I apologize, but I encountered an error while processing your request. Please try again.",
                 isStreaming: false,
               }
             : msg,
@@ -131,150 +138,239 @@ export default function AstraeusChat() {
   }
 
   return (
-    <div className="flex flex-col h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-800 relative overflow-hidden">
-      {/* Animated Background */}
+    <div className="min-h-screen bg-gradient-to-br from-purple-600 via-blue-600 to-rbc-blue font-inter relative overflow-hidden">
+      {/* Stripe-inspired vibrant background */}
       <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-[#005DAA] rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob"></div>
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-[#FFD200] rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-2000"></div>
-        <div className="absolute top-40 left-40 w-80 h-80 bg-purple-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-4000"></div>
+        {/* Main gradient mesh */}
+        <div className="absolute inset-0 bg-gradient-to-br from-purple-500/20 via-pink-500/10 to-orange-400/20"></div>
+        <div className="absolute inset-0 bg-gradient-to-tl from-blue-600/30 via-cyan-400/10 to-rbc-yellow/20"></div>
+
+        {/* Animated gradient orbs */}
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-gradient-to-r from-purple-400/30 to-pink-400/20 rounded-full blur-3xl animate-float"></div>
+        <div className="absolute bottom-0 right-1/4 w-80 h-80 bg-gradient-to-r from-orange-400/25 to-rbc-yellow/30 rounded-full blur-3xl animate-float-delayed"></div>
+        <div className="absolute top-1/2 left-1/2 w-64 h-64 bg-gradient-to-r from-cyan-400/20 to-blue-500/25 rounded-full blur-3xl animate-float-slow"></div>
       </div>
 
-      {/* Grid Pattern Overlay */}
-      <div className='absolute inset-0 bg-[url("data:image/svg+xml,%3Csvg%20width%3D%2260%22%20height%3D%2260%22%20viewBox%3D%220%200%2060%2060%22%20xmlns%3D%22http://www.w3.org/2000/svg%22%3E%3Cg%20fill%3D%22none%22%20fill-rule%3D%22evenodd%22%3E%3Cg%20fill%3D%22%23ffffff%22%20fill-opacity%3D%220.03%22%3E%3Ccircle%20cx%3D%2230%22%20cy%3D%2230%22%20r%3D%221%22/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")] opacity-50' />
-
-      {/* Header */}
-      <header className="relative z-10 backdrop-blur-xl bg-white/10 border-b border-white/20 px-6 py-4">
-        <div className="flex items-center justify-between max-w-6xl mx-auto">
-          <div className="flex items-center gap-4">
-            <div className="relative">
-              <div className="w-12 h-12 bg-gradient-to-br from-[#005DAA] to-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/25">
-                <Brain className="w-6 h-6 text-white" />
+      {/* Header with Stripe-style navigation */}
+      <header className="relative z-10 backdrop-blur-md bg-white/10 border-b border-white/20 px-6 py-4">
+        <div className="flex items-center justify-between max-w-7xl mx-auto">
+          <div className="flex items-center gap-6">
+            <div className="relative group">
+              <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-lg">
+                <Brain className="w-6 h-6 text-rbc-blue" />
               </div>
-              <div className="absolute -top-1 -right-1 w-4 h-4 bg-[#FFD200] rounded-full animate-pulse"></div>
             </div>
-            <div>
-              <h1 className="text-2xl font-bold text-white bg-gradient-to-r from-white to-blue-200 bg-clip-text text-transparent">
-                Astraeus
-              </h1>
-              <p className="text-sm text-blue-200/80 flex items-center gap-1">
-                <Sparkles className="w-3 h-3" />
-                RBC Internal Analytics Assistant
-              </p>
+            <div className="space-y-0.5">
+              <h1 className="text-xl font-bold text-white tracking-tight">Astraeus</h1>
+              <div className="flex items-center gap-2 text-white/80">
+                <Sparkles className="w-3 h-3 text-rbc-yellow" />
+                <span className="text-sm font-medium">RBC Analytics</span>
+              </div>
             </div>
           </div>
 
-          {/* Enhanced Model Toggle */}
-          <div className="flex items-center gap-3">
-            <div className="flex items-center gap-2 text-blue-200/80">
+          {/* Model selector */}
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2 text-white/80">
               <Activity className="w-4 h-4" />
               <span className="text-sm font-medium">Dataset:</span>
             </div>
-            <div className="relative">
-              <div className="flex bg-black/20 backdrop-blur-sm rounded-xl p-1 border border-white/10">
+            <div className="flex bg-white/20 backdrop-blur-sm rounded-full p-1 border border-white/30">
+              {["PAR", "DFR"].map((model) => (
                 <button
-                  onClick={() => setSelectedModel("PAR")}
-                  className={`relative px-4 py-2 text-sm font-semibold rounded-lg transition-all duration-300 ${
-                    selectedModel === "PAR"
-                      ? "bg-gradient-to-r from-[#005DAA] to-blue-600 text-white shadow-lg shadow-blue-500/25"
-                      : "text-blue-200/80 hover:text-white hover:bg-white/5"
-                  }`}
-                >
-                  {selectedModel === "PAR" && (
-                    <div className="absolute inset-0 bg-gradient-to-r from-[#005DAA] to-blue-600 rounded-lg animate-pulse opacity-50"></div>
+                  key={model}
+                  onClick={() => setSelectedModel(model as ModelType)}
+                  className={cn(
+                    "px-4 py-2 text-sm font-semibold rounded-full transition-all duration-300",
+                    selectedModel === model
+                      ? "bg-white text-rbc-blue shadow-lg"
+                      : "text-white/80 hover:text-white hover:bg-white/10",
                   )}
-                  <span className="relative">PAR</span>
-                </button>
-                <button
-                  onClick={() => setSelectedModel("DFR")}
-                  className={`relative px-4 py-2 text-sm font-semibold rounded-lg transition-all duration-300 ${
-                    selectedModel === "DFR"
-                      ? "bg-gradient-to-r from-[#005DAA] to-blue-600 text-white shadow-lg shadow-blue-500/25"
-                      : "text-blue-200/80 hover:text-white hover:bg-white/5"
-                  }`}
                 >
-                  {selectedModel === "DFR" && (
-                    <div className="absolute inset-0 bg-gradient-to-r from-[#005DAA] to-blue-600 rounded-lg animate-pulse opacity-50"></div>
-                  )}
-                  <span className="relative">DFR</span>
+                  {model}
                 </button>
-              </div>
+              ))}
             </div>
           </div>
         </div>
       </header>
 
-      {/* Chat Messages */}
-      <div className="flex-1 overflow-y-auto relative z-10">
-        <div className="max-w-5xl mx-auto px-6 py-8">
+      {/* Main content area */}
+      <div className="flex-1 relative z-10 min-h-[calc(100vh-140px)]">
+        <div className="max-w-7xl mx-auto px-6 py-12">
           {messages.length === 0 ? (
-            <div className="text-center py-16">
-              <div className="relative mb-8">
-                <div className="w-20 h-20 bg-gradient-to-br from-[#005DAA] to-blue-600 rounded-2xl flex items-center justify-center mx-auto shadow-2xl shadow-blue-500/25">
-                  <Database className="w-10 h-10 text-white" />
+            <div className="grid lg:grid-cols-2 gap-12 items-center min-h-[600px]">
+              {/* Left side - Hero content */}
+              <div className="space-y-8">
+                <div className="space-y-6">
+                  <h1 className="text-6xl lg:text-7xl font-bold leading-tight">
+                    <span className="text-white">Financial</span>
+                    <br />
+                    <span className="text-white">intelligence</span>
+                    <br />
+                    <span className="bg-gradient-to-r from-rbc-yellow via-orange-300 to-pink-300 bg-clip-text text-transparent">
+                      to grow your
+                    </span>
+                    <br />
+                    <span className="bg-gradient-to-r from-cyan-300 via-blue-300 to-purple-300 bg-clip-text text-transparent">
+                      insights
+                    </span>
+                  </h1>
+
+                  <p className="text-xl text-white/90 leading-relaxed max-w-lg">
+                    Join the thousands of analysts that use Astraeus to unlock deep insights from {selectedModel} data,
+                    power custom analytics models, and build more intelligent business decisions.
+                  </p>
                 </div>
-                <div className="absolute -top-2 -right-2 w-6 h-6 bg-[#FFD200] rounded-full animate-bounce"></div>
+
+                <div className="flex gap-4">
+                  <div className="flex-1 max-w-sm">
+                    <input
+                      type="text"
+                      placeholder="Ask about your data..."
+                      className="w-full px-4 py-3 bg-white/90 backdrop-blur-sm border border-white/30 rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white/50"
+                    />
+                  </div>
+                  <button className="px-6 py-3 bg-white text-rbc-blue font-semibold rounded-xl hover:bg-white/90 transition-colors shadow-lg">
+                    Start now →
+                  </button>
+                </div>
               </div>
-              <h2 className="text-3xl font-bold text-white mb-3 bg-gradient-to-r from-white to-blue-200 bg-clip-text text-transparent">
-                Welcome to Astraeus
-              </h2>
-              <p className="text-blue-200/80 mb-8 text-lg">
-                Ask questions about your <span className="text-[#FFD200] font-semibold">{selectedModel}</span> dataset
-                using natural language.
-              </p>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
-                <Card className="group p-6 bg-white/5 backdrop-blur-sm border border-white/10 hover:bg-white/10 transition-all duration-300 cursor-pointer hover:scale-105 hover:shadow-xl hover:shadow-blue-500/10">
-                  <div className="flex items-start gap-3">
-                    <BarChart3 className="w-5 h-5 text-[#FFD200] mt-1 group-hover:scale-110 transition-transform" />
-                    <p className="text-blue-100 group-hover:text-white transition-colors">
-                      "Show me the top 10 customers by revenue this quarter"
-                    </p>
+
+              {/* Right side - Floating UI mockups */}
+              <div className="relative">
+                {/* Analytics Dashboard Mockup */}
+                <div className="absolute top-0 right-0 w-80 h-64 bg-white/95 backdrop-blur-sm rounded-2xl shadow-2xl border border-white/20 p-6 transform rotate-3 hover:rotate-1 transition-transform duration-500">
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <h3 className="font-semibold text-gray-900">Analytics Dashboard</h3>
+                      <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                    </div>
+                    <div className="space-y-3">
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm text-gray-600">Revenue Growth</span>
+                        <span className="text-sm font-semibold text-green-600">+32.4%</span>
+                      </div>
+                      <div className="w-full bg-gray-200 rounded-full h-2">
+                        <div className="bg-gradient-to-r from-rbc-blue to-blue-500 h-2 rounded-full w-3/4"></div>
+                      </div>
+                      <div className="grid grid-cols-2 gap-4 pt-2">
+                        <div className="text-center">
+                          <div className="text-lg font-bold text-gray-900">$2.4M</div>
+                          <div className="text-xs text-gray-500">This Quarter</div>
+                        </div>
+                        <div className="text-center">
+                          <div className="text-lg font-bold text-gray-900">847</div>
+                          <div className="text-xs text-gray-500">Active Users</div>
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                </Card>
-                <Card className="group p-6 bg-white/5 backdrop-blur-sm border border-white/10 hover:bg-white/10 transition-all duration-300 cursor-pointer hover:scale-105 hover:shadow-xl hover:shadow-blue-500/10">
-                  <div className="flex items-start gap-3">
-                    <Zap className="w-5 h-5 text-[#FFD200] mt-1 group-hover:scale-110 transition-transform" />
-                    <p className="text-blue-100 group-hover:text-white transition-colors">
-                      "What's the trend in loan applications over the past 6 months?"
-                    </p>
+                </div>
+
+                {/* Query Interface Mockup */}
+                <div className="absolute top-20 left-0 w-72 h-48 bg-white/95 backdrop-blur-sm rounded-2xl shadow-2xl border border-white/20 p-5 transform -rotate-2 hover:rotate-0 transition-transform duration-500">
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-2">
+                      <Brain className="w-5 h-5 text-rbc-blue" />
+                      <span className="font-semibold text-gray-900">AI Query</span>
+                    </div>
+                    <div className="space-y-2">
+                      <div className="text-sm text-gray-600">"Show me top performing products"</div>
+                      <div className="bg-gray-50 rounded-lg p-3 text-xs">
+                        <div className="flex items-center gap-2 mb-2">
+                          <div className="w-1 h-1 bg-rbc-blue rounded-full"></div>
+                          <span className="text-gray-700">Product A: $1.2M revenue</span>
+                        </div>
+                        <div className="flex items-center gap-2 mb-2">
+                          <div className="w-1 h-1 bg-blue-500 rounded-full"></div>
+                          <span className="text-gray-700">Product B: $980K revenue</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <div className="w-1 h-1 bg-purple-500 rounded-full"></div>
+                          <span className="text-gray-700">Product C: $750K revenue</span>
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                </Card>
+                </div>
+
+                {/* Chart Mockup */}
+                <div className="absolute bottom-0 right-12 w-64 h-40 bg-white/95 backdrop-blur-sm rounded-2xl shadow-2xl border border-white/20 p-4 transform rotate-1 hover:-rotate-1 transition-transform duration-500">
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-semibold text-gray-900">Trend Analysis</span>
+                      <TrendingUp className="w-4 h-4 text-green-500" />
+                    </div>
+                    <div className="flex items-end justify-between h-16 gap-1">
+                      {[40, 65, 45, 80, 60, 90, 75].map((height, i) => (
+                        <div
+                          key={i}
+                          className="bg-gradient-to-t from-rbc-blue to-blue-400 rounded-sm flex-1"
+                          style={{ height: `${height}%` }}
+                        ></div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           ) : (
-            <div className="space-y-8">
-              {messages.map((message, index) => (
+            <div className="max-w-4xl mx-auto space-y-8">
+              {renderedMessages.map((message, index) => (
                 <div
                   key={message.id}
-                  className={`flex ${message.role === "user" ? "justify-end" : "justify-start"} animate-fade-in`}
+                  className={cn("flex animate-fade-in", message.role === "user" ? "justify-end" : "justify-start")}
                   style={{ animationDelay: `${index * 0.1}s` }}
                 >
                   <div
-                    className={`max-w-4xl px-6 py-4 rounded-2xl backdrop-blur-sm border transition-all duration-300 hover:scale-[1.02] ${
+                    className={cn(
+                      "max-w-3xl px-6 py-4 rounded-2xl backdrop-blur-sm border transition-all duration-300 hover:scale-[1.01]",
                       message.role === "user"
-                        ? "bg-gradient-to-r from-[#005DAA] to-blue-600 text-white border-blue-400/30 shadow-lg shadow-blue-500/25"
-                        : "bg-white/10 text-blue-50 border-white/20 hover:bg-white/15"
-                    }`}
+                        ? "bg-white/95 text-gray-900 border-white/30 shadow-lg"
+                        : "bg-white/90 text-gray-800 border-white/20 shadow-md",
+                    )}
                   >
-                    <div className="flex items-start gap-3">
+                    <div className="flex items-start gap-4">
                       {message.role === "assistant" && (
-                        <div className="w-8 h-8 bg-gradient-to-br from-[#FFD200] to-yellow-500 rounded-lg flex items-center justify-center mt-1 shadow-lg">
-                          <Brain className="w-4 h-4 text-gray-900" />
+                        <div className="w-8 h-8 bg-gradient-to-br from-rbc-blue to-blue-600 rounded-lg flex items-center justify-center shadow-md flex-shrink-0">
+                          <Brain className="w-4 h-4 text-white" />
                         </div>
                       )}
-                      <div className="flex-1">
-                        <div className="whitespace-pre-wrap leading-relaxed">
-                          {message.content}
-                          {message.isStreaming && (
-                            <span className="inline-block w-2 h-5 bg-current ml-1 animate-pulse rounded-sm" />
-                          )}
-                        </div>
-                        <div
-                          className={`text-xs mt-3 flex items-center gap-1 ${
-                            message.role === "user" ? "text-blue-100" : "text-blue-300"
-                          }`}
-                        >
+                      <div className="flex-1 min-w-0">
+                        {message.role === "assistant" ? (
+                          <div
+                            className="prose prose-gray max-w-none"
+                            dangerouslySetInnerHTML={{ __html: message.renderedContent }}
+                          />
+                        ) : (
+                          <div className="leading-relaxed font-medium">{message.content}</div>
+                        )}
+
+                        {message.isStreaming && (
+                          <div className="flex items-center gap-2 mt-3">
+                            <div className="flex space-x-1">
+                              {[0, 1, 2].map((i) => (
+                                <div
+                                  key={i}
+                                  className="w-1.5 h-1.5 bg-rbc-blue rounded-full animate-bounce"
+                                  style={{ animationDelay: `${i * 0.1}s` }}
+                                />
+                              ))}
+                            </div>
+                            <span className="text-xs text-gray-500">Analyzing...</span>
+                          </div>
+                        )}
+
+                        <div className="flex items-center gap-2 mt-3 text-xs text-gray-500">
                           <div className="w-1 h-1 bg-current rounded-full"></div>
-                          {message.timestamp.toLocaleTimeString()}
+                          <span>{message.timestamp.toLocaleTimeString()}</span>
+                          {message.role === "assistant" && (
+                            <>
+                              <div className="w-1 h-1 bg-current rounded-full"></div>
+                              <span>{selectedModel} Dataset</span>
+                            </>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -287,66 +383,55 @@ export default function AstraeusChat() {
         </div>
       </div>
 
-      {/* Enhanced Input Area */}
-      <div className="relative z-10 backdrop-blur-xl bg-white/10 border-t border-white/20 px-6 py-6">
-        <form onSubmit={handleSubmit} className="max-w-5xl mx-auto">
-          <div className="flex gap-4 items-end">
-            <div className="flex-1 relative group">
-              <div className="absolute inset-0 bg-gradient-to-r from-[#005DAA]/20 to-blue-600/20 rounded-2xl blur-sm group-focus-within:blur-md transition-all"></div>
-              <textarea
-                ref={textareaRef}
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyDown={handleKeyDown}
-                placeholder={`Ask a question about ${selectedModel} data...`}
-                className="relative w-full px-6 py-4 bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl resize-none focus:outline-none focus:ring-2 focus:ring-[#005DAA]/50 focus:border-[#005DAA]/50 text-white placeholder-blue-200/60 transition-all duration-300"
-                rows={1}
-                style={{
-                  minHeight: "56px",
-                  maxHeight: "140px",
-                  height: "auto",
-                }}
-                disabled={isLoading}
-              />
-              {isLoading && (
-                <div className="absolute right-4 top-1/2 transform -translate-y-1/2">
-                  <div className="flex space-x-1">
-                    <div className="w-2 h-2 bg-[#FFD200] rounded-full animate-bounce"></div>
-                    <div
-                      className="w-2 h-2 bg-[#FFD200] rounded-full animate-bounce"
-                      style={{ animationDelay: "0.1s" }}
-                    ></div>
-                    <div
-                      className="w-2 h-2 bg-[#FFD200] rounded-full animate-bounce"
-                      style={{ animationDelay: "0.2s" }}
-                    ></div>
+      {/* Input area */}
+      {messages.length > 0 && (
+        <div className="relative z-10 backdrop-blur-md bg-white/10 border-t border-white/20 px-6 py-6">
+          <form onSubmit={handleSubmit} className="max-w-4xl mx-auto">
+            <div className="flex gap-4 items-end">
+              <div className="flex-1 relative">
+                <textarea
+                  ref={textareaRef}
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                  placeholder={`Ask a question about ${selectedModel} data...`}
+                  className="w-full px-6 py-4 bg-white/95 backdrop-blur-sm border border-white/30 rounded-2xl resize-none focus:outline-none focus:ring-2 focus:ring-white/50 text-gray-900 placeholder-gray-500 transition-all duration-300 shadow-lg"
+                  rows={1}
+                  style={{
+                    minHeight: "56px",
+                    maxHeight: "140px",
+                  }}
+                  disabled={isLoading}
+                />
+                {isLoading && (
+                  <div className="absolute right-4 top-1/2 transform -translate-y-1/2">
+                    <div className="flex items-center gap-2">
+                      <div className="flex space-x-1">
+                        {[0, 1, 2].map((i) => (
+                          <div
+                            key={i}
+                            className="w-1.5 h-1.5 bg-rbc-blue rounded-full animate-bounce"
+                            style={{ animationDelay: `${i * 0.1}s` }}
+                          />
+                        ))}
+                      </div>
+                      <span className="text-xs text-gray-500">Processing...</span>
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
+              </div>
+
+              <button
+                type="submit"
+                disabled={!input.trim() || isLoading}
+                className="p-4 bg-white text-rbc-blue rounded-2xl shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-xl disabled:opacity-50 disabled:hover:scale-100 disabled:cursor-not-allowed"
+              >
+                <Send className="w-5 h-5" />
+              </button>
             </div>
-            <Button
-              type="submit"
-              disabled={!input.trim() || isLoading}
-              className="relative bg-gradient-to-r from-[#005DAA] to-blue-600 hover:from-[#004A8A] hover:to-blue-700 text-white px-6 py-4 h-14 rounded-2xl shadow-lg shadow-blue-500/25 transition-all duration-300 hover:scale-105 hover:shadow-xl hover:shadow-blue-500/40 disabled:opacity-50 disabled:hover:scale-100 group"
-            >
-              <Send className="w-5 h-5 group-hover:translate-x-0.5 transition-transform" />
-              <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
-            </Button>
-          </div>
-          <div className="flex items-center justify-between mt-4 text-xs text-blue-200/60">
-            <div className="flex items-center gap-2">
-              <div className="w-1 h-1 bg-[#FFD200] rounded-full animate-pulse"></div>
-              <span>Press Enter to send, Shift+Enter for new line</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div
-                className={`w-2 h-2 rounded-full ${selectedModel === "PAR" ? "bg-green-400" : "bg-blue-400"} animate-pulse`}
-              ></div>
-              <span>Connected to {selectedModel} dataset</span>
-            </div>
-          </div>
-        </form>
-      </div>
+          </form>
+        </div>
+      )}
     </div>
   )
 }
